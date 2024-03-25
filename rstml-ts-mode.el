@@ -99,7 +99,18 @@
      ((parent-is "parameters") parent-bol rstml-ts-mode-indent-offset)
      ((parent-is "struct_pattern") parent-bol rstml-ts-mode-indent-offset)
      ((parent-is "token_tree") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "use_list") parent-bol rstml-ts-mode-indent-offset)))
+     ((parent-is "use_list") parent-bol rstml-ts-mode-indent-offset)
+
+     ((parent-is "delim_nodes") parent-bol rstml-ts-mode-indent-offset)
+
+     ((and (parent-is "open_tag") (node-is ">")) parent 0)
+     ((parent-is "open_tag") parent rstml-ts-mode-indent-offset)
+     ((and (parent-is "self_closing_element_node") (node-is "/>")) parent 0)
+     ((parent-is "self_closing_element_node") parent rstml-ts-mode-indent-offset)
+
+     ((node-is "close_tag") parent 0)
+     ((parent-is "element_node") parent rstml-ts-mode-indent-offset)
+     ((parent-is "nodes") parent 0)))
   "Tree-sitter indent rules for `rstml-ts-mode'.")
 
 (defvar rstml-ts-mode--builtin-macros
