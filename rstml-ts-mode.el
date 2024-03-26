@@ -299,6 +299,28 @@
    '((escape_sequence) @font-lock-escape-face)
 
    :language 'rust_with_rstml
+   :feature 'rstml
+   :override t
+   '((fragment_node ["<>" "</>"] @font-lock-operator-face)
+     (open_tag ["<" ">"] @font-lock-operator-face)
+     (close_tag ["</" ">"] @font-lock-operator-face)
+     (self_closing_element_node ["<" "/>"] @font-lock-operator-face))
+
+   :language 'rust_with_rstml
+   :feature 'rstml
+   '((open_tag
+      name: (node_identifier (identifier) @font-lock-function-call-face))
+     (close_tag
+      name: (node_identifier (identifier) @font-lock-function-call-face))
+     (self_closing_element_node
+      name: (node_identifier (identifier) @font-lock-function-call-face)))
+
+   :language 'rust_with_rstml
+   :feature 'rstml
+   '((node_attribute
+      name: (node_identifier (identifier) @font-lock-constant-face)))
+
+   :language 'rust_with_rstml
    :feature 'error
    :override t
    '((ERROR) @font-lock-warning-face))
@@ -436,7 +458,7 @@ delimiters < and >'s."
                 '((comment definition)
                   (keyword string)
                   (assignment attribute builtin constant escape-sequence
-                              number type)
+                              number type rstml)
                   (bracket delimiter error function operator property variable)))
 
     ;; Imenu.
