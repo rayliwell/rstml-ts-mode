@@ -105,12 +105,13 @@
 
      ((and (parent-is "open_tag") (node-is ">")) parent 0)
      ((parent-is "open_tag") parent rstml-ts-mode-indent-offset)
+     ((and (parent-is "close_tag") (node-is ">")) parent 0)
+     ((parent-is "close_tag") parent rstml-ts-mode-indent-offset)
      ((and (parent-is "self_closing_element_node") (node-is "/>")) parent 0)
      ((parent-is "self_closing_element_node") parent rstml-ts-mode-indent-offset)
 
      ((node-is "close_tag") parent 0)
-     ((parent-is "element_node") parent rstml-ts-mode-indent-offset)
-     ((parent-is "nodes") parent 0)))
+     ((parent-is "element_node") parent rstml-ts-mode-indent-offset)))
   "Tree-sitter indent rules for `rstml-ts-mode'.")
 
 (defvar rstml-ts-mode--builtin-macros
@@ -301,8 +302,7 @@
    :language 'rust_with_rstml
    :feature 'rstml
    :override t
-   '((fragment_node ["<>" "</>"] @font-lock-operator-face)
-     (open_tag ["<" ">"] @font-lock-operator-face)
+   '((open_tag ["<" ">"] @font-lock-operator-face)
      (close_tag ["</" ">"] @font-lock-operator-face)
      (self_closing_element_node ["<" "/>"] @font-lock-operator-face))
 
