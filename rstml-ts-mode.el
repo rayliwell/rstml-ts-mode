@@ -34,46 +34,9 @@
 ;;; Code:
 
 (require 'treesit)
+(require 'rust-ts-mode)
 (eval-when-compile (require 'rx))
 (require 'c-ts-common) ; For comment indent and filling.
-
-(declare-function treesit-parser-create "treesit.c")
-(declare-function treesit-induce-sparse-tree "treesit.c")
-(declare-function treesit-node-child "treesit.c")
-(declare-function treesit-node-child-by-field-name "treesit.c")
-(declare-function treesit-node-start "treesit.c")
-(declare-function treesit-node-end "treesit.c")
-(declare-function treesit-node-type "treesit.c")
-(declare-function treesit-node-parent "treesit.c")
-(declare-function treesit-query-compile "treesit.c")
-
-(defcustom rstml-ts-mode-indent-offset 4
-  "Number of spaces for each indentation step in `rstml-ts-mode'."
-  :version "29.1"
-  :type 'integer
-  :safe 'integerp
-  :group 'rstml)
-
-(defvar rstml-ts-mode--syntax-table
-  (let ((table (make-syntax-table)))
-    (modify-syntax-entry ?+   "."      table)
-    (modify-syntax-entry ?-   "."      table)
-    (modify-syntax-entry ?=   "."      table)
-    (modify-syntax-entry ?%   "."      table)
-    (modify-syntax-entry ?&   "."      table)
-    (modify-syntax-entry ?|   "."      table)
-    (modify-syntax-entry ?^   "."      table)
-    (modify-syntax-entry ?!   "."      table)
-    (modify-syntax-entry ?@   "."      table)
-    (modify-syntax-entry ?~   "."      table)
-    (modify-syntax-entry ?<   "."      table)
-    (modify-syntax-entry ?>   "."      table)
-    (modify-syntax-entry ?/   ". 124b" table)
-    (modify-syntax-entry ?*   ". 23"   table)
-    (modify-syntax-entry ?\n  "> b"    table)
-    (modify-syntax-entry ?\^m "> b"    table)
-    table)
-  "Syntax table for `rstml-ts-mode'.")
 
 (defvar rstml-ts-mode--indent-rules
   `((rust_with_rstml
@@ -84,34 +47,34 @@
      ((and (parent-is "comment") c-ts-common-looking-at-star)
       c-ts-common-comment-start-after-first-star -1)
      ((parent-is "comment") prev-adaptive-prefix 0)
-     ((parent-is "arguments") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "await_expression") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "array_expression") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "binary_expression") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "block") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "declaration_list") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "enum_variant_list") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "field_declaration_list") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "field_expression") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "field_initializer_list") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "let_declaration") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "macro_definition") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "parameters") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "struct_pattern") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "token_tree") parent-bol rstml-ts-mode-indent-offset)
-     ((parent-is "use_list") parent-bol rstml-ts-mode-indent-offset)
+     ((parent-is "arguments") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "await_expression") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "array_expression") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "binary_expression") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "block") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "declaration_list") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "enum_variant_list") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "field_declaration_list") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "field_expression") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "field_initializer_list") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "let_declaration") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "macro_definition") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "parameters") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "struct_pattern") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "token_tree") parent-bol rust-ts-mode-indent-offset)
+     ((parent-is "use_list") parent-bol rust-ts-mode-indent-offset)
 
-     ((parent-is "delim_nodes") parent-bol rstml-ts-mode-indent-offset)
+     ((parent-is "delim_nodes") parent-bol rust-ts-mode-indent-offset)
 
      ((and (parent-is "open_tag") (node-is ">")) parent 0)
-     ((parent-is "open_tag") parent rstml-ts-mode-indent-offset)
+     ((parent-is "open_tag") parent rust-ts-mode-indent-offset)
      ((and (parent-is "close_tag") (node-is ">")) parent 0)
-     ((parent-is "close_tag") parent rstml-ts-mode-indent-offset)
+     ((parent-is "close_tag") parent rust-ts-mode-indent-offset)
      ((and (parent-is "self_closing_element_node") (node-is "/>")) parent 0)
-     ((parent-is "self_closing_element_node") parent rstml-ts-mode-indent-offset)
+     ((parent-is "self_closing_element_node") parent rust-ts-mode-indent-offset)
 
      ((node-is "close_tag") parent 0)
-     ((parent-is "element_node") parent rstml-ts-mode-indent-offset)))
+     ((parent-is "element_node") parent rust-ts-mode-indent-offset)))
   "Tree-sitter indent rules for `rstml-ts-mode'.")
 
 (defvar rstml-ts-mode--builtin-macros
@@ -440,7 +403,7 @@ delimiters < and >'s."
 (define-derived-mode rstml-ts-mode prog-mode "Rust with rstml"
   "Major mode for editing Rust, powered by tree-sitter."
   :group 'rstml
-  :syntax-table rstml-ts-mode--syntax-table
+  :syntax-table rust-ts-mode--syntax-table
 
   (when (treesit-ready-p 'rust_with_rstml)
     (treesit-parser-create 'rust_with_rstml)
