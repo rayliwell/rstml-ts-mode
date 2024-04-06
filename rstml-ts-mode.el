@@ -400,6 +400,23 @@ delimiters < and >'s."
                             (?> '(5 . ?<))))))))
 
 ;;;###autoload
+(defun rstml-ts-mode-install-language-grammar ()
+  "Install the `rust_with_rstml' grammar."
+  (interactive)
+  (let ((treesit-language-source-alist
+         '((rust_with_rstml
+            "https://github.com/rayliwell/tree-sitter-rstml"
+            "main"
+            "rust_with_rstml/src"))))
+    (treesit-install-language-grammar 'rust_with_rstml)))
+
+;;;###autoload
+(defun rstml-ts-mode-ensure-language-grammar ()
+  "Install the `rust_with_rstml' grammar if not already installed."
+  (unless (treesit-language-available-p 'rust_with_rstml)
+    (rstml-ts-mode-install-language-grammar)))
+
+;;;###autoload
 (define-derived-mode rstml-ts-mode prog-mode "Rust with rstml"
   "Major mode for editing Rust, powered by tree-sitter."
   :group 'rstml
