@@ -308,17 +308,17 @@
 
    :language 'rust_with_rstml
    :feature 'rstml
+   '((node_identifier (identifier) @font-lock-constant-face))
+
+   :language 'rust_with_rstml
+   :feature 'rstml
+   :override t
    '((open_tag
       name: (node_identifier (identifier) @font-lock-function-call-face))
      (close_tag
       name: (node_identifier (identifier) @font-lock-function-call-face))
      (self_closing_element_node
       name: (node_identifier (identifier) @font-lock-function-call-face)))
-
-   :language 'rust_with_rstml
-   :feature 'rstml
-   '((node_attribute
-      name: (node_identifier (identifier) @font-lock-constant-face)))
 
    :language 'rust_with_rstml
    :feature 'error
